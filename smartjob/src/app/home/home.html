@@ -1,0 +1,47 @@
+<section class="hero">
+  <h1>SmartJob <span class="highlight">Hunter</span></h1>
+  <p>Tvoj osobný asistent riadený AI pri hľadaní práce snov.</p>
+  
+  <div class="search-bar">
+    <input type="text" placeholder="Pozícia (napr. Angular Developer)..." />
+    <input type="text" placeholder="Lokalita..." />
+    <button class="btn-primary">Hľadať</button>
+  </div>
+</section>
+
+<section class="featured-jobs">
+  <div class="section-header">
+    <h2>Najnovšie ponuky</h2>
+    <button class="btn-outline">Zobraziť všetky</button>
+  </div>
+
+  <div class="job-grid">
+    @for (job of featuredJobs(); track job.id) {
+      <article class="job-card">
+        <div class="card-body">
+          <span class="badge">Nové</span>
+          <h3>{{ job.title }}</h3>
+          <p class="company">{{ job.company }}</p>
+          <p class="location">{{ job.location }}</p>
+        </div>
+        <div class="card-footer">
+          <span class="salary">{{ job.salary }}</span>
+          <button class="btn-sm">Detail</button>
+        </div>
+      </article>
+    } @empty {
+      <div class="empty-state">
+        <p>Momentálne nie sú dostupné žiadne ponuky.</p>
+      </div>
+    }
+  </div>
+</section>
+
+@if (isLoggedIn()) {
+  <section class="ai-status">
+    <div class="status-card">
+      <h3>AI Analýza profilu</h3>
+      <p>coskoro</p>
+    </div>
+  </section>
+}

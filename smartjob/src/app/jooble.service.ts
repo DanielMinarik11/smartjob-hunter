@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface JoobleSearchParams {
+  radius: string;
   keywords: string;
   location: string;
   salary_min?: number;
@@ -22,15 +23,21 @@ export class JoobleService {
     const body: any = {
       keywords: params.keywords,
       location: params.location,
+      radius: params.radius,
+      page: "1",
+      companysearch: "false"
     };
 
-    if (params.salary_min != null) {
-      body.salary_min = params.salary_min;
-    }
+    console.log(params);
+    console.log(body);
 
-    if (params.salary_max != null) {
-      body.salary_max = params.salary_max;
-    }
+    // if (params.salary_min != null) {
+    //   body.salary_min = params.salary_min;
+    // }
+
+    // if (params.salary_max != null) {
+    //   body.salary_max = params.salary_max;
+    // }
 
     return this.http.post(this.url, body);
   }

@@ -129,8 +129,10 @@ export class Home implements OnInit {
     this.errorMessage.set('');
 
     const query = this.query();
+    console.log('Jooble query:', query);
     this.joobleService
       .searchJobs({
+        radius: "80",
         keywords: query.keywords || 'angular developer',
         location: query.location || 'Slovakia',
         salary_min: query.minSalary,

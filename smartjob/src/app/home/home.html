@@ -1,47 +1,50 @@
-<section class="hero">
+﻿<section class="hero">
   <h1>SmartJob <span class="highlight">Hunter</span></h1>
-  <p>Tvoj osobný asistent riadený AI pri hľadaní práce snov.</p>
-  
-  <div class="search-bar">
-    <input type="text" placeholder="Profesia" />
-    <input type="text" placeholder="Lokalita..." />
-    <button class="btn-primary">Hľadať</button>
+  <p>Tvoj osobný asistent pri hľadaní práce z Jooble</p>
+
+  <div class="filters-card">
+    <div class="filter-row">
+      <label>Hľadať pozíciu</label>
+      <input type="text" [(ngModel)]="keywords" placeholder="napr. vývojár, účtovník" />
+    </div>
+
+    <div class="filter-row">
+      <label>Mesto / región</label>
+      <input type="text" [(ngModel)]="location" placeholder="napr. Bratislava" />
+    </div>
+
+    <div class="filter-row">
+      <label>Minimálna mzda</label>
+      <input type="number" [(ngModel)]="minSalary" placeholder="€" />
+    </div>
+
+    <div class="filter-row">
+      <label>Maximálna mzda</label>
+      <input type="number" [(ngModel)]="maxSalary" placeholder="€" />
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn-primary" (click)="loadJobsFromJooble()" [disabled]="isLoading()">
+        {{ isLoading() ? 'Načítavam...' : 'Vyhľadať' }}
+      </button>
+      <button class="btn-outline" (click)="clearFilters()">Vymazať filtre</button>
+    </div>
   </div>
 </section>
 
-<section class="featured-jobs">
-  <div class="section-header">
-    <h2>Najnovšie ponuky</h2>
-    <button class="btn-outline">Zobraziť všetky</button>
-  </div>
+<section class="results">
+  <p *ngIf="errorMessage()" class="error">{{ errorMessage() }}</p>
+  <p *ngIf="!isLoading() && filteredJobs().length === 0">Žiadne výsledky pre zadané kritériá.</p>
 
   <div class="job-grid">
-    @for (job of featuredJobs(); track job.id) {
-      <article class="job-card">
-        <div class="card-body">
-          <span class="badge">Nové</span>
-          <h3>{{ job.title }}</h3>
-          <p class="company">{{ job.company }}</p>
-          <p class="location">{{ job.location }}</p>
-        </div>
-        <div class="card-footer">
-          <span class="salary">{{ job.salary }}</span>
-          <button class="btn-sm">Detail</button>
-        </div>
-      </article>
-    } @empty {
-      <div class="empty-state">
-        <p>Momentálne nie sú dostupné žiadne ponuky.</p>
+    <article *ngFor="let job of filteredJobs()" class="job-card">
+      <div class="card-body">
+        <h3>{{ job.title }}</h3>
+        <p class="company">{{ job.company }}</p>
+        <p class="location">{{ job.location }}</p>
+        <p class="salary">{{ job.salary }}</p>
+        <p class="date-posted">Zverejnené: {{ job.datePosted | date }}</p>
       </div>
-    }
+    </article>
   </div>
 </section>
-
-@if (isLoggedIn()) {
-  <section class="ai-status">
-    <div class="status-card">
-      <h3>AI Analýza profilu</h3>
-      <p>coskoro</p>
-    </div>
-  </section>
-}

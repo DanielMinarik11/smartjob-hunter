@@ -2,6 +2,37 @@
   <h1>SmartJob <span class="highlight">Hunter</span></h1>
   <p>Tvoj osobný asistent pri hľadaní práce z Jooble</p>
 
+  <button class="auth-toggle" type="button" (click)="toggleAuthPanel()">
+    {{ authPanelOpen() ? '✕' : '👤' }}
+  </button>
+
+  <div class="auth-drawer" *ngIf="authPanelOpen()">
+    <div class="auth-header">
+      <h2>{{ authMode() === 'register' ? 'Registrácia' : 'Prihlásenie' }}</h2>
+      <button class="auth-switch" type="button" (click)="setAuthMode(authMode() === 'register' ? 'login' : 'register')">
+        {{ authMode() === 'register' ? 'Prihlásiť sa' : 'Registrovať' }}
+      </button>
+    </div>
+
+    <div class="filter-row">
+      <label>Email</label>
+      <input type="email" [(ngModel)]="authEmail" placeholder="napr. meno@priklad.sk" />
+    </div>
+    <div class="filter-row">
+      <label>heslo</label>
+      <input type="password" [(ngModel)]="authPassword" placeholder="heslo" />
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn-primary" type="button" (click)="authMode() === 'register' ? registerUser() : loginUser()" [disabled]="isLoading()">
+        {{ isLoading() ? 'Čakajte...' : authMode() === 'register' ? 'Registrovať' : 'Prihlásiť sa' }}
+      </button>
+    </div>
+
+    <p *ngIf="authMessage()" class="success">{{ authMessage() }}</p>
+    <p *ngIf="authError()" class="error">{{ authError() }}</p>
+  </div>
+
   <div class="filters-card">
     <div class="filter-row">
       <label>Hľadať pozíciu</label>

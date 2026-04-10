@@ -5,6 +5,7 @@
 }
 
 .hero {
+  position: relative;
   text-align: center;
   padding: 4rem 1rem;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -70,6 +71,91 @@ h1 { font-size: 3rem; margin-bottom: 1rem; }
   padding: 0.8rem 2rem;
   border-radius: 30px;
   cursor: pointer;
+}
+
+.auth-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  color: #007bff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.auth-drawer {
+  position: absolute;
+  top: 4.5rem;
+  right: 1rem;
+  width: min(340px, calc(100vw - 2rem));
+  background: white;
+  border-radius: 24px;
+  padding: 1.25rem;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+  text-align: left;
+  z-index: 10;
+}
+
+.auth-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.auth-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.auth-switch {
+  background: transparent;
+  border: 1px solid #007bff;
+  color: #007bff;
+  padding: 0.6rem 1rem;
+  border-radius: 30px;
+  cursor: pointer;
+}
+
+.auth-drawer .filter-row {
+  margin-bottom: 1rem;
+}
+
+.auth-drawer .filter-row label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: #555;
+}
+
+.auth-drawer .filter-row input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  outline: none;
+}
+
+.auth-drawer .btn-primary {
+  width: 100%;
+}
+
+.auth-drawer .success,
+.auth-drawer .error {
+  margin-top: 0.75rem;
+}
+
+.auth-drawer .success {
+  color: #1c7f4d;
+}
+
+.auth-drawer .error {
+  color: #c33;
 }
 
 .ai-status {

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { JoobleService } from '../jooble.service';
+import { FirebaseAuthService } from '../firebase-auth.service';
 
 export interface Job {
   id: number;
@@ -34,6 +35,12 @@ const INITIAL_JOBS: Job[] = [
 export class Home implements OnInit {
   isLoading = signal(false);
   errorMessage = signal('');
+  authMessage = signal('');
+  authError = signal('');
+  authEmail = signal('');
+  authPassword = signal('');
+  authPanelOpen = signal(false);
+  authMode = signal<'register' | 'login'>('register');
 
   jobs = signal<Job[]>(INITIAL_JOBS);
 
@@ -88,11 +95,83 @@ export class Home implements OnInit {
     });
   });
 
-  constructor(private joobleService: JoobleService) {}
+  constructor(private joobleService: JoobleService, private authService: FirebaseAuthService) {}
 
   ngOnInit(): void {
     // Po otvorení stránky necháme predplnené filtre prázdne.
     // Volanie API vykoná používateľ kliknutím na tlačidlo Hľadať.
+  }
+
+  toggleAuthPanel(): void {
+    this.authPanelOpen.update((open) => !open);
+    this.authMessage.set('');
+    this.authError.set('');
+  }
+
+  setAuthMode(mode: 'register' | 'login'): void {
+    this.authMode.set(mode);
+    this.authMessage.set('');
+    this.authError.set('');
+  }
+
+  loginUser(): void {
+    this.authMessage.set('');
+    this.authError.set('');
+    const email = this.authEmail().trim();
+    const password = this.authPassword();
+
+    if (!email || !password) {
+      this.authError.set('Vyplňte email a heslo.');
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    this.authService
+      .login(email, password)
+      .then((credential) => {
+        this.authMessage.set('Prihlásenie bolo úspešné.');
+        this.authEmail.set('');
+        this.authPassword.set('');
+        console.log('Firebase user signed in:', credential.user);
+      })
+      .catch((err) => {
+        console.error('Firebase login error', err);
+        this.authError.set(err?.message ?? 'Prihlásenie zlyhalo. Skúste to neskôr.');
+      })
+      .finally(() => {
+        this.isLoading.set(false);
+      });
+  }
+
+  registerUser(): void {
+    this.authMessage.set('');
+    this.authError.set('');
+    const email = this.authEmail().trim();
+    const password = this.authPassword();
+
+    if (!email || !password) {
+      this.authError.set('Vyplňte email a heslo.');
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    this.authService
+      .register(email, password)
+      .then((credential) => {
+        this.authMessage.set('Registrácia prebehla úspešne. Skontrolujte svoju emailovú schránku.');
+        this.authEmail.set('');
+        this.authPassword.set('');
+        console.log('Firebase user created:', credential.user);
+      })
+      .catch((err) => {
+        console.error('Firebase registration error', err);
+        this.authError.set(err?.message ?? 'Registrácia zlyhala. Skúste to neskôr.');
+      })
+      .finally(() => {
+        this.isLoading.set(false);
+      });
   }
 
   private mapJoobleItem(item: any, idx: number): Job {

@@ -1,33 +1,66 @@
 ﻿<section class="hero">
   <h1>SmartJob <span class="highlight">Hunter</span></h1>
   <p>Tvoj osobný asistent pri hľadaní práce z Jooble</p>
+  <p *ngIf="currentUser()" class="signed-in-banner">
+    Prihlásený ako <strong>{{ currentUser()?.email }}</strong>
+  </p>
 
   <button class="auth-toggle" type="button" (click)="toggleAuthPanel()">
-    {{ authPanelOpen() ? '✕' : '👤' }}
+    {{ authPanelOpen() ? '✕' : currentUser() ? '🧑‍💼' : '👤' }}
   </button>
 
   <div class="auth-drawer" *ngIf="authPanelOpen()">
     <div class="auth-header">
-      <h2>{{ authMode() === 'register' ? 'Registrácia' : 'Prihlásenie' }}</h2>
-      <button class="auth-switch" type="button" (click)="setAuthMode(authMode() === 'register' ? 'login' : 'register')">
+      <h2>{{ currentUser() ? 'Môj profil' : authMode() === 'register' ? 'Registrácia' : 'Prihlásenie' }}</h2>
+      <button class="auth-switch" type="button" *ngIf="!currentUser()" (click)="setAuthMode(authMode() === 'register' ? 'login' : 'register')">
         {{ authMode() === 'register' ? 'Prihlásiť sa' : 'Registrovať' }}
       </button>
     </div>
 
-    <div class="filter-row">
-      <label>Email</label>
-      <input type="email" [(ngModel)]="authEmail" placeholder="napr. meno@priklad.sk" />
-    </div>
-    <div class="filter-row">
-      <label>heslo</label>
-      <input type="password" [(ngModel)]="authPassword" placeholder="heslo" />
+    <div *ngIf="currentUser(); else loginForm">
+      <div class="profile-widget">
+        <div class="profile-avatar">{{ userInitials() }}</div>
+        <div>
+          <p class="profile-name">{{ userName() }}</p>
+          <p class="profile-status">Účet aktívny</p>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h3>Nastavenia profilu</h3>
+        <ul class="settings-list">
+          <li><span>Email</span><strong>{{ currentUser()?.email }}</strong></li>
+          <li><span>Stav verifikácie</span><strong>{{ currentUser()?.emailVerified ? 'Overený' : 'Neoverený' }}</strong></li>
+          <li><span>Prihlásenie</span><strong>Firebase email</strong></li>
+        </ul>
+      </div>
+
+      <div class="account-actions">
+        <button class="btn-outline" type="button" (click)="logoutUser()" [disabled]="isLoading()">
+          Odhlásiť sa
+        </button>
+        <button class="btn-secondary" type="button" disabled>
+          Upraviť profil
+        </button>
+      </div>
     </div>
 
-    <div class="filter-actions">
-      <button class="btn-primary" type="button" (click)="authMode() === 'register' ? registerUser() : loginUser()" [disabled]="isLoading()">
-        {{ isLoading() ? 'Čakajte...' : authMode() === 'register' ? 'Registrovať' : 'Prihlásiť sa' }}
-      </button>
-    </div>
+    <ng-template #loginForm>
+      <div class="filter-row">
+        <label>Email</label>
+        <input type="email" [(ngModel)]="authEmail" placeholder="napr. meno@priklad.sk" />
+      </div>
+      <div class="filter-row">
+        <label>heslo</label>
+        <input type="password" [(ngModel)]="authPassword" placeholder="heslo" />
+      </div>
+
+      <div class="filter-actions">
+        <button class="btn-primary" type="button" (click)="authMode() === 'register' ? registerUser() : loginUser()" [disabled]="isLoading()">
+          {{ isLoading() ? 'Čakajte...' : authMode() === 'register' ? 'Registrovať' : 'Prihlásiť sa' }}
+        </button>
+      </div>
+    </ng-template>
 
     <p *ngIf="authMessage()" class="success">{{ authMessage() }}</p>
     <p *ngIf="authError()" class="error">{{ authError() }}</p>

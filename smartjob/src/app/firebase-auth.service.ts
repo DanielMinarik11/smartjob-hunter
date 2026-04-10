@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { Auth, createUserWithEmailAndPassword, getAuth, sendEmailVerification, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
+import { Auth, createUserWithEmailAndPassword, getAuth, sendEmailVerification, signInWithEmailAndPassword, signOut, onAuthStateChanged, User, UserCredential } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyC6AUl-M9h63CR0M_IczSpN_Hc5RRVx9MY',
@@ -48,5 +48,13 @@ export class FirebaseAuthService {
     }
 
     return signInWithEmailAndPassword(this.auth, email, password);
+  }
+
+  logout(): Promise<void> {
+    return signOut(this.auth);
+  }
+
+  onAuthStateChanged(callback: (user: User | null) => void): void {
+    onAuthStateChanged(this.auth, callback);
   }
 }

@@ -1,6 +1,7 @@
 ﻿import { Component, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { User } from 'firebase/auth';
 
 import { JoobleService } from '../jooble.service';
 import { FirebaseAuthService } from '../firebase-auth.service';
@@ -41,6 +42,26 @@ export class Home implements OnInit {
   authPassword = signal('');
   authPanelOpen = signal(false);
   authMode = signal<'register' | 'login'>('register');
+  currentUser = signal<User | null>(null);
+
+  userName = computed(() => {
+    const user = this.currentUser();
+    if (!user) return 'Hosť';
+    return user.displayName?.trim() || user.email || 'Používateľ';
+  });
+
+  userInitials = computed(() => {
+    const user = this.currentUser();
+    const value = user?.displayName?.trim() || user?.email || '';
+    return value
+      .split(/[@ ._\-]+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0].toUpperCase())
+      .join('') || 'U';
+  });
+
+  isLoggedIn = computed(() => !!this.currentUser());
 
   jobs = signal<Job[]>(INITIAL_JOBS);
 
@@ -100,6 +121,13 @@ export class Home implements OnInit {
   ngOnInit(): void {
     // Po otvorení stránky necháme predplnené filtre prázdne.
     // Volanie API vykoná používateľ kliknutím na tlačidlo Hľadať.
+    this.authService.onAuthStateChanged((user) => {
+      this.currentUser.set(user);
+      if (user) {
+        this.authPanelOpen.set(false);
+        this.authMode.set('login');
+      }
+    });
   }
 
   toggleAuthPanel(): void {
@@ -138,6 +166,26 @@ export class Home implements OnInit {
       .catch((err) => {
         console.error('Firebase login error', err);
         this.authError.set(err?.message ?? 'Prihlásenie zlyhalo. Skúste to neskôr.');
+      })
+      .finally(() => {
+        this.isLoading.set(false);
+      });
+  }
+
+  logoutUser(): void {
+    this.authMessage.set('');
+    this.authError.set('');
+    this.isLoading.set(true);
+
+    this.authService
+      .logout()
+      .then(() => {
+        this.authMessage.set('Boli ste úspešne odhlásený.');
+        this.currentUser.set(null);
+      })
+      .catch((err) => {
+        console.error('Firebase logout error', err);
+        this.authError.set(err?.message ?? 'Odhlásenie zlyhalo. Skúste to neskôr.');
       })
       .finally(() => {
         this.isLoading.set(false);

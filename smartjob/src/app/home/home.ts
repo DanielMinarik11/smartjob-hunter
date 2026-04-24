@@ -17,6 +17,16 @@ export interface Job {
   datePosted: string;
 }
 
+export interface ProfileDraft {
+  languages: string[];
+  skills: string[];
+  preferences: string[];
+  desiredRoles: string[];
+  preferredLocations: string[];
+  experienceLevel: string;
+  desiredSalary: string;
+}
+
 const INITIAL_JOBS: Job[] = [
   { id: 1, title: 'Predavač / Pokladník', company: 'Lidl Slovenská republika', location: 'Bratislava - Ružinov', salary: '1100€ - 1350€', salaryMin: 1100, salaryMax: 1350, datePosted: '2026-03-15' },
   { id: 2, title: 'Čašník / Servírka', company: 'Reštaurácia Staré Mesto', location: 'Košice / Centrum', salary: '900€ - 1050€', salaryMin: 900, salaryMax: 1050, datePosted: '2026-03-12' },
@@ -24,6 +34,14 @@ const INITIAL_JOBS: Job[] = [
   { id: 4, title: 'Skladník / Vodič', company: 'Logistics Park', location: 'Senec', salary: '1200€ - 1450€', salaryMin: 1200, salaryMax: 1450, datePosted: '2026-03-10' },
   { id: 5, title: 'Barman', company: 'Sky Bar & Lounge', location: 'Bratislava', salary: '1000€ - 1200€', salaryMin: 1000, salaryMax: 1200, datePosted: '2026-03-08' },
   { id: 6, title: 'Upratovačka / Chyžná', company: 'Penzión Pohoda', location: 'Banská Bystrica', salary: '850€ - 950€', salaryMin: 850, salaryMax: 950, datePosted: '2026-03-11' },
+  { id: 7, title: 'Recepčný / Recepčná', company: 'Hotel Central', location: 'Bratislava - Staré Mesto', salary: '1150€ - 1300€', salaryMin: 1150, salaryMax: 1300, datePosted: '2026-03-18' },
+  { id: 8, title: 'Operátor výroby', company: 'Techline Slovakia', location: 'Trnava', salary: '1050€ - 1250€', salaryMin: 1050, salaryMax: 1250, datePosted: '2026-03-17' },
+  { id: 9, title: 'Asistent/ka kancelárie', company: 'Office Support', location: 'Nitra', salary: '1200€ - 1400€', salaryMin: 1200, salaryMax: 1400, datePosted: '2026-03-16' },
+  { id: 10, title: 'Kuriér / Rozvozca', company: 'DPD Slovakia', location: 'Bratislava - Petržalka', salary: '1000€ - 1300€', salaryMin: 1000, salaryMax: 1300, datePosted: '2026-03-14' },
+  { id: 11, title: 'Učiteľ / Lektor', company: 'Jazyková škola Lingua', location: 'Prešov', salary: '900€ - 1100€', salaryMin: 900, salaryMax: 1100, datePosted: '2026-03-13' },
+  { id: 12, title: 'Skladový operátor', company: 'Amazon Fulfillment', location: 'Senec', salary: '1250€ - 1500€', salaryMin: 1250, salaryMax: 1500, datePosted: '2026-03-19' },
+  { id: 13, title: 'Zákaznícka podpora', company: 'HelpDesk Solutions', location: 'Košice', salary: '1050€ - 1250€', salaryMin: 1050, salaryMax: 1250, datePosted: '2026-03-20' },
+  { id: 14, title: 'Šéfkuchár / Kuchár', company: 'Bistro Panorama', location: 'Žilina', salary: '1400€ - 1700€', salaryMin: 1400, salaryMax: 1700, datePosted: '2026-03-21' },
 ];
 
 @Component({
@@ -43,6 +61,174 @@ export class Home implements OnInit {
   authPanelOpen = signal(false);
   authMode = signal<'register' | 'login'>('register');
   currentUser = signal<User | null>(null);
+
+  profileEditOpen = signal(false);
+  profileDraft = signal<ProfileDraft>({
+    languages: [],
+    skills: [],
+    preferences: [],
+    desiredRoles: [],
+    preferredLocations: [],
+    experienceLevel: '',
+    desiredSalary: '',
+  });
+
+  readonly languageOptions = [
+    { value: '🇸🇰 Slovenčina', label: '🇸🇰 Slovenčina' },
+    { value: '🇬🇧 Angličtina', label: '🇬🇧 Angličtina' },
+    { value: '🇩🇪 Nemčina', label: '🇩🇪 Nemčina' },
+    { value: '🇨🇿 Čeština', label: '🇨🇿 Čeština' },
+    { value: '🇷🇺 Ruština', label: '🇷🇺 Ruština' },
+    { value: '🇵🇱 Poľština', label: '🇵🇱 Poľština' },
+    { value: '🇪🇸 Španielčina', label: '🇪🇸 Španielčina' },
+  ];
+
+  readonly skillOptions = [
+    { value: 'Komunikácia', label: 'Komunikácia' },
+    { value: 'Tímová práca', label: 'Tímová práca' },
+    { value: 'Organizácia', label: 'Organizácia' },
+    { value: 'Excel', label: 'Excel' },
+    { value: 'Zákaznícky servis', label: 'Zákaznícky servis' },
+    { value: 'Logistika', label: 'Logistika' },
+  ];
+
+  readonly preferenceOptions = [
+    { value: 'Plný úväzok', label: 'Plný úväzok' },
+    { value: 'Čiastočný úväzok', label: 'Čiastočný úväzok' },
+    { value: 'Flexibilný čas', label: 'Flexibilný čas' },
+    { value: 'Home office', label: 'Home office' },
+    { value: 'Smenný režim', label: 'Smenný režim' },
+  ];
+
+  readonly roleOptions = [
+    { value: 'Administratíva', label: 'Administratíva' },
+    { value: 'Predaj', label: 'Predaj' },
+    { value: 'Logistika', label: 'Logistika' },
+    { value: 'Gastronómia', label: 'Gastronómia' },
+    { value: 'IT a podpora', label: 'IT a podpora' },
+    { value: 'Zákaznícky servis', label: 'Zákaznícky servis' },
+  ];
+
+  readonly locationOptions = [
+    { value: 'Bratislava', label: 'Bratislava' },
+    { value: 'Košice', label: 'Košice' },
+    { value: 'Prešov', label: 'Prešov' },
+    { value: 'Nitra', label: 'Nitra' },
+    { value: 'Trnava', label: 'Trnava' },
+    { value: 'Žilina', label: 'Žilina' },
+  ];
+
+  readonly experienceOptions = [
+    { value: 'Žiadne skúsenosti', label: 'Žiadne skúsenosti' },
+    { value: 'Junior', label: 'Junior' },
+    { value: 'Stredná úroveň', label: 'Stredná úroveň' },
+    { value: 'Senior', label: 'Senior' },
+  ];
+
+  readonly salaryOptions = [
+    { value: 'do 1000€', label: 'do 1000€' },
+    { value: '1000€ - 1400€', label: '1000€ - 1400€' },
+    { value: '1400€ - 1800€', label: '1400€ - 1800€' },
+    { value: 'nad 1800€', label: 'nad 1800€' },
+  ];
+
+  get selectedLanguages(): string[] {
+    return this.profileDraft().languages;
+  }
+
+  get selectedSkills(): string[] {
+    return this.profileDraft().skills;
+  }
+
+  get selectedPreferences(): string[] {
+    return this.profileDraft().preferences;
+  }
+
+  get selectedRoles(): string[] {
+    return this.profileDraft().desiredRoles;
+  }
+
+  get selectedLocations(): string[] {
+    return this.profileDraft().preferredLocations;
+  }
+
+  get selectedExperience(): string {
+    return this.profileDraft().experienceLevel;
+  }
+
+  get selectedSalary(): string {
+    return this.profileDraft().desiredSalary;
+  }
+
+  toggleProfileItem(category: 'languages' | 'skills' | 'preferences' | 'desiredRoles' | 'preferredLocations', value: string): void {
+    const current = this.profileDraft()[category] as string[];
+    const next = current.includes(value) ? current.filter((item) => item !== value) : [...current, value];
+    this.profileDraft.update((draft) => ({ ...draft, [category]: next } as ProfileDraft));
+  }
+
+  setProfileValue(field: 'experienceLevel' | 'desiredSalary', value: string): void {
+    this.profileDraft.update((draft) => ({ ...draft, [field]: value } as ProfileDraft));
+  }
+
+  private readonly profileStoragePrefix = 'smartjob-user-profile:';
+
+  private getProfileStorageKey(): string {
+    const user = this.currentUser();
+    return `${this.profileStoragePrefix}${user?.uid || user?.email || 'guest'}`;
+  }
+
+  private loadProfileDraft(user: User | null): void {
+    const defaultDraft: ProfileDraft = {
+      languages: [],
+      skills: [],
+      preferences: [],
+      desiredRoles: [],
+      preferredLocations: [],
+      experienceLevel: '',
+      desiredSalary: '',
+    };
+    if (!user) {
+      this.profileDraft.set(defaultDraft);
+      return;
+    }
+
+    const stored = localStorage.getItem(this.getProfileStorageKey());
+    if (!stored) {
+      this.profileDraft.set(defaultDraft);
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(stored) as Partial<ProfileDraft>;
+      const languages = Array.isArray(parsed.languages) ? parsed.languages : [];
+      const skills = Array.isArray(parsed.skills) ? parsed.skills : [];
+      const preferences = Array.isArray(parsed.preferences) ? parsed.preferences : [];
+      const desiredRoles = Array.isArray(parsed.desiredRoles) ? parsed.desiredRoles : [];
+      const preferredLocations = Array.isArray(parsed.preferredLocations) ? parsed.preferredLocations : [];
+      const experienceLevel = typeof parsed.experienceLevel === 'string' ? parsed.experienceLevel : '';
+      const desiredSalary = typeof parsed.desiredSalary === 'string' ? parsed.desiredSalary : '';
+      this.profileDraft.set({ languages, skills, preferences, desiredRoles, preferredLocations, experienceLevel, desiredSalary });
+    } catch {
+      this.profileDraft.set(defaultDraft);
+    }
+  }
+
+  toggleProfileEdit(): void {
+    this.profileEditOpen.update((open) => !open);
+    this.authMessage.set('');
+    this.authError.set('');
+  }
+
+  saveProfile(): void {
+    if (!this.currentUser()) {
+      this.authError.set('Prihláste sa, aby ste mohli upraviť profil.');
+      return;
+    }
+
+    localStorage.setItem(this.getProfileStorageKey(), JSON.stringify(this.profileDraft()));
+    this.authMessage.set('Profil bol uložený.');
+    this.profileEditOpen.set(false);
+  }
 
   userName = computed(() => {
     const user = this.currentUser();
@@ -127,6 +313,7 @@ export class Home implements OnInit {
         this.authPanelOpen.set(false);
         this.authMode.set('login');
       }
+      this.loadProfileDraft(user);
     });
   }
 

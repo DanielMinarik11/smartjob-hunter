@@ -27,21 +27,166 @@
       </div>
 
       <div class="profile-section">
-        <h3>Nastavenia profilu</h3>
+        <h3>Informácie o profile</h3>
         <ul class="settings-list">
           <li><span>Email</span><strong>{{ currentUser()?.email }}</strong></li>
           <li><span>Stav verifikácie</span><strong>{{ currentUser()?.emailVerified ? 'Overený' : 'Neoverený' }}</strong></li>
           <li><span>Prihlásenie</span><strong>Firebase email</strong></li>
         </ul>
+
+        <div class="profile-summary">
+          <div class="summary-row" *ngIf="selectedLanguages.length">
+            <span>Jazyky</span>
+            <strong>{{ selectedLanguages.join(', ') }}</strong>
+          </div>
+          <div class="summary-row" *ngIf="selectedSkills.length">
+            <span>Zručnosti</span>
+            <strong>{{ selectedSkills.join(', ') }}</strong>
+          </div>
+          <div class="summary-row" *ngIf="selectedRoles.length">
+            <span>Preferované oblasti</span>
+            <strong>{{ selectedRoles.join(', ') }}</strong>
+          </div>
+          <div class="summary-row" *ngIf="selectedLocations.length">
+            <span>Preferované lokality</span>
+            <strong>{{ selectedLocations.join(', ') }}</strong>
+          </div>
+          <div class="summary-row" *ngIf="selectedExperience">
+            <span>Skúsenosti</span>
+            <strong>{{ selectedExperience }}</strong>
+          </div>
+          <div class="summary-row" *ngIf="selectedSalary">
+            <span>Očakávaná mzda</span>
+            <strong>{{ selectedSalary }}</strong>
+          </div>
+          <p class="muted" *ngIf="!selectedLanguages.length && !selectedSkills.length && !selectedPreferences.length && !selectedRoles.length && !selectedLocations.length && !selectedExperience && !selectedSalary">
+            Profil ešte nemá uložené preferencie. Kliknite na Upraviť profil pre nastavenie.
+          </p>
+        </div>
       </div>
 
       <div class="account-actions">
+        <button class="btn-outline" type="button" (click)="toggleProfileEdit()" [disabled]="isLoading()">
+          {{ profileEditOpen() ? 'Zavrieť úpravy profilu' : 'Upraviť profil' }}
+        </button>
         <button class="btn-outline" type="button" (click)="logoutUser()" [disabled]="isLoading()">
           Odhlásiť sa
         </button>
-        <button class="btn-secondary" type="button" disabled>
-          Upraviť profil
-        </button>
+      </div>
+
+      <div class="profile-edit-section" *ngIf="profileEditOpen()">
+        <h3>Upraviť preferencie</h3>
+        <p class="section-note">Vyber si jazyky, zručnosti a pracovné preferencie, ktoré chceš mať uložené.</p>
+
+        <div class="selection-group">
+          <p class="group-title">Jazyky</p>
+          <div class="option-grid">
+            <button
+              type="button"
+              class="option-chip"
+              *ngFor="let option of languageOptions"
+              [class.selected]="selectedLanguages.includes(option.value)"
+              [attr.aria-pressed]="selectedLanguages.includes(option.value)"
+              (click)="toggleProfileItem('languages', option.value)">
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="selection-group">
+          <p class="group-title">Zručnosti</p>
+          <div class="option-grid">
+            <button
+              type="button"
+              class="option-chip"
+              *ngFor="let option of skillOptions"
+              [class.selected]="selectedSkills.includes(option.value)"
+              [attr.aria-pressed]="selectedSkills.includes(option.value)"
+              (click)="toggleProfileItem('skills', option.value)">
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="selection-group">
+          <p class="group-title">Preferencie</p>
+          <div class="option-grid">
+            <button
+              type="button"
+              class="option-chip"
+              *ngFor="let option of preferenceOptions"
+              [class.selected]="selectedPreferences.includes(option.value)"
+              [attr.aria-pressed]="selectedPreferences.includes(option.value)"
+              (click)="toggleProfileItem('preferences', option.value)">
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="selection-group">
+          <p class="group-title">Oblasti / pozície</p>
+          <div class="option-grid">
+            <button
+              type="button"
+              class="option-chip"
+              *ngFor="let option of roleOptions"
+              [class.selected]="selectedRoles.includes(option.value)"
+              [attr.aria-pressed]="selectedRoles.includes(option.value)"
+              (click)="toggleProfileItem('desiredRoles', option.value)">
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="selection-group">
+          <p class="group-title">Preferované lokality</p>
+          <div class="option-grid">
+            <button
+              type="button"
+              class="option-chip"
+              *ngFor="let option of locationOptions"
+              [class.selected]="selectedLocations.includes(option.value)"
+              [attr.aria-pressed]="selectedLocations.includes(option.value)"
+              (click)="toggleProfileItem('preferredLocations', option.value)">
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="selection-group">
+          <p class="group-title">Úroveň skúseností</p>
+          <div class="option-grid">
+            <button
+              type="button"
+              class="option-chip"
+              *ngFor="let option of experienceOptions"
+              [class.selected]="selectedExperience === option.value"
+              [attr.aria-pressed]="selectedExperience === option.value"
+              (click)="setProfileValue('experienceLevel', option.value)">
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="selection-group">
+          <p class="group-title">Očakávaná mzda</p>
+          <div class="option-grid">
+            <button
+              type="button"
+              class="option-chip"
+              *ngFor="let option of salaryOptions"
+              [class.selected]="selectedSalary === option.value"
+              [attr.aria-pressed]="selectedSalary === option.value"
+              (click)="setProfileValue('desiredSalary', option.value)">
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="edit-actions">
+          <button class="btn-primary" type="button" (click)="saveProfile()">Uložiť profil</button>
+          <button class="btn-outline" type="button" (click)="toggleProfileEdit()">Zrušiť</button>
+        </div>
       </div>
     </div>
 

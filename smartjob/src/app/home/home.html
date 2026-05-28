@@ -243,10 +243,25 @@
 
 <section class="results">
   <p *ngIf="errorMessage()" class="error">{{ errorMessage() }}</p>
+
+  <div class="saved-jobs-panel" *ngIf="savedJobs.length">
+    <h3>Uložené ponuky</h3>
+    <div class="saved-jobs-list">
+      <div class="saved-job" *ngFor="let saved of savedJobs" (click)="startApplication(saved.id)" role="button" tabindex="0" (keydown.enter)="startApplication(saved.id)">
+        <div>
+          <strong>{{ saved.title }}</strong>
+          <p>{{ saved.company }} · {{ saved.location }}</p>
+        </div>
+        <button class="btn-secondary" type="button" (click)="toggleSavedJob(saved.id); $event.stopPropagation()">Odstrániť</button>
+      </div>
+    </div>
+  </div>
+
+  <p *ngIf="!savedJobs.length && !isLoading()" class="muted">Žiadne uložené ponuky.</p>
   <p *ngIf="!isLoading() && filteredJobs().length === 0">Žiadne výsledky pre zadané kritériá.</p>
 
   <div class="job-grid">
-    <article *ngFor="let job of filteredJobs()" class="job-card">
+    <article *ngFor="let job of filteredJobs()" class="job-card" (click)="startApplication(job.id, $event)">
       <div class="card-body">
         <h3>{{ job.title }}</h3>
         <p class="company">{{ job.company }}</p>
@@ -256,4 +271,24 @@
       </div>
     </article>
   </div>
+
+  <app-application-panel
+    *ngIf="applicationPanelOpen() && selectedApplicationJob()"
+    [job]="selectedApplicationJob()"
+    [applicationNote]="applicationNote()"
+    (applicationNoteChange)="applicationNote.set($event)"
+    [applicationFiles]="applicationFiles()"
+    [applicationMessages]="applicationMessages()"
+    [applicationStatus]="applicationStatus()"
+    [chatInput]="chatInput()"
+    [isSaved]="selectedApplicationJob() ? isJobSaved(selectedApplicationJob()!.id) : false"
+    (close)="closeApplication()"
+    (send)="sendApplication()"
+    (save)="selectedApplicationJob() && toggleSavedJob(selectedApplicationJob()!.id)"
+    (help)="requestApplicationHelp()"
+    (chatInputChange)="chatInput.set($event)"
+    (chatSend)="sendChatMessage()"
+    (filesChanged)="handleApplicationFiles($event)"
+    (fileRemove)="removeApplicationFile($event)">
+  </app-application-panel>
 </section>

@@ -1,0 +1,149 @@
+﻿<div id="application-panel" class="application-panel" role="dialog" aria-modal="true">
+  <div class="application-panel-card">
+    <div class="application-panel-header">
+      <div>
+        <p class="application-tag">APLIKÁCIA</p>
+        <h3>Prihláška na pozíciu {{ job?.title }}</h3>
+        <p class="application-subtitle">{{ job?.company }} · {{ job?.location }}</p>
+      </div>
+      <button class="btn-outline small" type="button" (click)="close.emit()" aria-label="Zavrieť">✕</button>
+    </div>
+
+    <div class="application-meta" *ngIf="job">
+      <div class="meta-chip">
+        <span class="meta-chip-label">Typ pracovnej ponuky</span>
+        <strong>{{ job.employmentType }}</strong>
+      </div>
+      <div class="meta-chip">
+        <span class="meta-chip-label">Požadovaná úroveň</span>
+        <strong>{{ job.experience }}</strong>
+      </div>
+      <div class="meta-chip">
+        <span class="meta-chip-label">Očakávaná mzda</span>
+        <strong>{{ job.salary }}</strong>
+      </div>
+    </div>
+
+    <div class="application-body">
+      <div class="application-column left-column">
+        <section class="panel-section-card">
+          <div class="section-header">
+            <div>
+              <p class="section-eyebrow">FORMULÁR</p>
+              <h4>Sprievodný text</h4>
+            </div>
+            <span class="section-badge">Krok 1</span>
+          </div>
+
+          <div class="input-group">
+            <label>Pridať sprievodný text</label>
+            <textarea [ngModel]="applicationNote" (ngModelChange)="onNoteChange($event)"></textarea>
+          </div>
+        </section>
+
+        <section class="panel-section-card">
+          <div class="section-header">
+            <div>
+              <p class="section-eyebrow">PRÍLOHY</p>
+              <h4>Dokumenty</h4>
+            </div>
+            <span class="section-badge">Krok 2</span>
+          </div>
+
+          <div class="input-group">
+            <label>Priložené súbory</label>
+            <input type="file" multiple (change)="onFilesChanged($event)" />
+            <div class="file-tags" *ngIf="applicationFiles?.length">
+              <span class="file-tag" *ngFor="let file of applicationFiles; let i = index">
+                {{ file.name }}
+                <button type="button" class="remove-file" (click)="removeFile(i)">×</button>
+              </span>
+            </div>
+            <p class="hint">Môžete priložiť životopis, motivačný list alebo portfólio.</p>
+          </div>
+        </section>
+
+        <section class="panel-section-card actions-card">
+          <div class="section-header">
+            <div>
+              <p class="section-eyebrow">AKCIE</p>
+              <h4>Odoslanie prihlášky</h4>
+            </div>
+            <span class="section-badge status-badge" *ngIf="applicationStatus">Aktívne</span>
+          </div>
+
+          <div class="application-actions">
+            <button class="btn-primary" type="button" (click)="send.emit()">Odoslať prihlášku</button>
+            <button class="btn-outline" type="button" (click)="save.emit()">{{ isSaved ? 'Uložené' : 'Uložiť ponuku' }}</button>
+            <button class="btn-outline" type="button" (click)="help.emit()">Pomoc so správou</button>
+          </div>
+
+          <p class="application-status" *ngIf="applicationStatus">{{ applicationStatus }}</p>
+        </section>
+      </div>
+
+      <div class="application-column chat-column">
+        <section class="panel-section-card suggested-questions-panel">
+          <div class="suggested-questions-header">
+            <div>
+              <p class="section-eyebrow">NAVRHOVANÉ OTÁZKY</p>
+              <h4>Vyber si tému</h4>
+            </div>
+            <p class="hint">Klikni na otázku a doplní sa do vstupu.</p>
+          </div>
+
+          <div class="suggested-tabs" role="tablist" aria-label="Kategórie otázok">
+            <button
+              type="button"
+              class="suggested-tab"
+              *ngFor="let tab of suggestedQuestionsByTab | keyvalue"
+              [class.active]="selectedQuestionTab === tab.key"
+              (click)="selectQuestionTab(tab.key)">
+              {{ tab.value.label }}
+            </button>
+          </div>
+
+          <div class="suggested-question-list">
+            <button
+              type="button"
+              class="suggested-question-chip"
+              *ngFor="let question of selectedSuggestedQuestions"
+              (click)="applySuggestedQuestion(question)">
+              {{ question }}
+            </button>
+          </div>
+        </section>
+
+        <section class="panel-section-card chat-main-card">
+          <div class="section-header">
+            <div>
+              <p class="section-eyebrow">ROZHOVOR</p>
+              <h4>Asistent pomoci</h4>
+            </div>
+            <span class="section-badge">Live</span>
+          </div>
+
+          <div class="chat-box" #chatMessagesContainer>
+            <div class="chat-message" *ngFor="let message of applicationMessages" [class.user]="message.sender === 'user'" [class.assistant]="message.sender === 'assistant'">
+              <div class="bubble">{{ message.text }}</div>
+            </div>
+          </div>
+
+          <div class="chat-input-row">
+            <textarea
+              class="chat-input"
+              [ngModel]="chatInput"
+              (ngModelChange)="onChatInputChange($event)"
+              placeholder="Napíš otázku alebo návrh na úpravu..."
+              rows="3"></textarea>
+            <button class="btn-primary small" type="button" (click)="sendChat()" [disabled]="!chatInput.trim()">Odoslať</button>
+          </div>
+
+          <p class="hint">V tomto rozhovor môžeš zadať otázku a dostať jednoduchú odpoveď, ktorá sa zobrazí ako chat správa.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+

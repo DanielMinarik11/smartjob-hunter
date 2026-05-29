@@ -378,13 +378,15 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-  flex: 1 1 auto;
-  min-height: 520px;
+  flex: 0 0 420px;
+  height: 420px;
+  min-height: 420px;
+  max-height: 420px;
   margin-top: 1rem;
 }
 
 
-.chat-box{display:flex;flex-direction:column;gap:.7rem;flex:1 1 auto;min-height:0;max-height:100%;height:100%;overflow-y:auto;padding:.9rem;border-radius:18px;border:1px solid #d5e0fb;background:#f8fbff}
+.chat-box{display:flex;flex-direction:column;gap:.7rem;flex:1 1 auto;min-height:0;height:auto;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;overscroll-behavior:contain;padding:.9rem;border-radius:18px;border:1px solid #d5e0fb;background:#f8fbff}
 
 .chat-message {
   display:flex;

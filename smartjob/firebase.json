@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/smartjob",
+    "public": "dist/smartjob/browser",
     "ignore": [
       "firebase.json",
       "**/.*",

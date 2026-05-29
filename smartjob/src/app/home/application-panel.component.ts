@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -32,7 +32,7 @@ type QuestionTab = 'prihlaska' | 'cv' | 'dokumenty' | 'styl';
   templateUrl: './application-panel.component.html',
   styleUrls: ['./application-panel.component.css'],
 })
-export class ApplicationPanelComponent implements AfterViewChecked {
+export class ApplicationPanelComponent implements AfterViewChecked, AfterViewInit {
   @ViewChild('chatMessagesContainer') chatMessagesContainer!: ElementRef<HTMLDivElement>;
 
   @Input() job: Job | null = null;
@@ -120,6 +120,11 @@ export class ApplicationPanelComponent implements AfterViewChecked {
 
   get selectedSuggestedQuestions(): string[] {
     return this.suggestedQuestionsByTab[this.selectedQuestionTab].questions;
+  }
+
+  ngAfterViewInit(): void {
+    this.scrollChatToBottom();
+    this.lastMessageCount = this.applicationMessages.length;
   }
 
   ngAfterViewChecked(): void {

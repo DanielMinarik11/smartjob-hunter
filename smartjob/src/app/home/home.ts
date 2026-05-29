@@ -533,16 +533,18 @@ export class Home implements OnInit {
     return this.query().minSalary;
   }
 
-  set minSalary(value: number | undefined) {
-    this.query.update((q) => ({ ...q, minSalary: value }));
+  set minSalary(value: number | string | undefined) {
+    const parsed = value === '' || value == null ? undefined : Number(value);
+    this.query.update((q) => ({ ...q, minSalary: Number.isFinite(parsed) ? parsed : undefined }));
   }
 
   get maxSalary(): number | undefined {
     return this.query().maxSalary;
   }
 
-  set maxSalary(value: number | undefined) {
-    this.query.update((q) => ({ ...q, maxSalary: value }));
+  set maxSalary(value: number | string | undefined) {
+    const parsed = value === '' || value == null ? undefined : Number(value);
+    this.query.update((q) => ({ ...q, maxSalary: Number.isFinite(parsed) ? parsed : undefined }));
   }
 
   filteredJobs = computed(() => {
@@ -551,8 +553,8 @@ export class Home implements OnInit {
     return all.filter((job) => {
       const textMatch = `${job.title} ${job.company} ${job.location}`.toLowerCase().includes(q.keywords.toLowerCase());
       const locationMatch = !q.location || job.location.toLowerCase().includes(q.location.toLowerCase());
-      const minMatch = q.minSalary == null || job.salaryMax >= q.minSalary;
-      const maxMatch = q.maxSalary == null || job.salaryMin <= q.maxSalary;
+      const minMatch = q.minSalary == null || job.salaryMin >= q.minSalary;
+      const maxMatch = q.maxSalary == null || job.salaryMax <= q.maxSalary;
       return textMatch && locationMatch && minMatch && maxMatch;
     });
   });

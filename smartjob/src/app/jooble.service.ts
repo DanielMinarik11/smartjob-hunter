@@ -31,13 +31,6 @@ export class JoobleService {
     console.log(params);
     console.log(body);
 
-    // if (params.salary_min != null) {
-    //   body.salary_min = params.salary_min;
-    // }
-
-    // if (params.salary_max != null) {
-    //   body.salary_max = params.salary_max;
-    // }
 
     return this.http.post(this.url, body);
   }

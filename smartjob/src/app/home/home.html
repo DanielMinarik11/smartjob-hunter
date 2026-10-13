@@ -1,12 +1,24 @@
 ﻿<section class="hero">
-  <h1>SmartJob <span class="highlight">Hunter</span></h1>
-  <p>Tvoj osobný asistent pri hľadaní práce</p>
+  <div class="hero-brand" aria-label="SmartJob Hunter">
+    <span class="brand-symbol" aria-hidden="true">S</span>
+    <span>SmartJob <strong>Hunter</strong></span>
+  </div>
+  <div class="hero-content">
+    <p class="eyebrow"><span class="eyebrow-dot"></span> Tvoja ďalšia kapitola sa začína tu</p>
+    <h1>Nájdi prácu, ktorá <span class="highlight">ti sadne.</span></h1>
+    <p class="hero-description">SmartJob Hunter ti pomôže objaviť príležitosti, ktoré zodpovedajú tvojim skúsenostiam aj predstavám.</p>
+    <div class="hero-points" aria-label="Výhody SmartJob Hunter">
+      <span><span aria-hidden="true">✓</span> Ponuky na jednom mieste</span>
+      <span><span aria-hidden="true">✓</span> Jednoduché vyhľadávanie</span>
+      <span><span aria-hidden="true">✓</span> Príprava na prihlášku</span>
+    </div>
+  </div>
   <p *ngIf="currentUser()" class="signed-in-banner">
     Prihlásený ako <strong>{{ currentUser()?.email }}</strong>
   </p>
 
-  <button class="auth-toggle" type="button" (click)="toggleAuthPanel()">
-    {{ authPanelOpen() ? '✕' : currentUser() ? '🧑‍💼' : '👤' }}
+  <button class="auth-toggle" type="button" (click)="toggleAuthPanel()" [attr.aria-expanded]="authPanelOpen()" [attr.aria-label]="authPanelOpen() ? 'Zavrieť účet' : 'Otvoriť účet'">
+    <span aria-hidden="true">{{ authPanelOpen() ? '×' : currentUser() ? userInitials() : '👤' }}</span>
   </button>
 
   <div class="auth-drawer" *ngIf="authPanelOpen()">
@@ -211,32 +223,40 @@
     <p *ngIf="authError()" class="error">{{ authError() }}</p>
   </div>
 
-  <div class="filters-card">
+  <div class="filters-card" role="group" aria-label="Filtre pracovných ponúk">
+    <div class="filters-heading">
+      <span class="search-icon" aria-hidden="true">⌕</span>
+      <div>
+        <h2>Čo hľadáš?</h2>
+        <p>Uprav filtre a nájdi svoju ďalšiu príležitosť.</p>
+      </div>
+    </div>
     <div class="filter-row">
-      <label>Hľadať pozíciu</label>
-      <input type="text" [(ngModel)]="keywords" placeholder="napr. vývojár, účtovník" />
+      <label for="job-keywords">Pracovná pozícia</label>
+      <input id="job-keywords" type="text" [(ngModel)]="keywords" placeholder="napr. vývojár, účtovník" (keyup.enter)="loadJobsFromJooble()" />
     </div>
 
     <div class="filter-row">
-      <label>Mesto / región</label>
-      <input type="text" [(ngModel)]="location" placeholder="napr. Bratislava" />
+      <label for="job-location">Mesto alebo región</label>
+      <input id="job-location" type="text" [(ngModel)]="location" placeholder="napr. Bratislava" (keyup.enter)="loadJobsFromJooble()" />
     </div>
 
     <div class="filter-row">
-      <label>Minimálna mzda</label>
-      <input type="number" [(ngModel)]="minSalary" placeholder="€" />
+      <label for="job-min-salary">Minimálna mzda</label>
+      <input id="job-min-salary" type="number" [(ngModel)]="minSalary" placeholder="Napr. 1 200 €" (keyup.enter)="loadJobsFromJooble()" />
     </div>
 
     <div class="filter-row">
-      <label>Maximálna mzda</label>
-      <input type="number" [(ngModel)]="maxSalary" placeholder="€" />
+      <label for="job-max-salary">Maximálna mzda</label>
+      <input id="job-max-salary" type="number" [(ngModel)]="maxSalary" placeholder="Napr. 2 000 €" (keyup.enter)="loadJobsFromJooble()" />
     </div>
 
     <div class="filter-actions">
-      <button class="btn-primary" (click)="loadJobsFromJooble()" [disabled]="isLoading()">
-        {{ isLoading() ? 'Načítavam...' : 'Vyhľadať' }}
+      <button class="btn-primary" type="button" (click)="loadJobsFromJooble()" [disabled]="isLoading()">
+        <span aria-hidden="true">{{ isLoading() ? '◌' : '⌕' }}</span>
+        {{ isLoading() ? 'Načítavam ponuky...' : 'Vyhľadať ponuky' }}
       </button>
-      <button class="btn-outline" (click)="clearFilters()">Vymazať filtre</button>
+      <button class="btn-outline" type="button" (click)="clearFilters()">Vymazať filtre</button>
     </div>
   </div>
 </section>
@@ -245,29 +265,62 @@
   <p *ngIf="errorMessage()" class="error">{{ errorMessage() }}</p>
 
   <div class="saved-jobs-panel" *ngIf="savedJobs.length">
-    <h3>Uložené ponuky</h3>
+    <div class="saved-heading">
+      <div>
+        <p class="section-kicker">Tvoj výber</p>
+        <h2>Uložené ponuky <span class="count-pill">{{ savedJobs.length }}</span></h2>
+      </div>
+      <p class="saved-hint">Ponuky, ku ktorým sa chceš vrátiť</p>
+    </div>
     <div class="saved-jobs-list">
       <div class="saved-job" *ngFor="let saved of savedJobs" (click)="startApplication(saved.id)" role="button" tabindex="0" (keydown.enter)="startApplication(saved.id)">
         <div>
           <strong>{{ saved.title }}</strong>
           <p>{{ saved.company }} · {{ saved.location }}</p>
         </div>
-        <button class="btn-secondary" type="button" (click)="toggleSavedJob(saved.id); $event.stopPropagation()">Odstrániť</button>
+        <button class="btn-secondary" type="button" (click)="toggleSavedJob(saved.id); $event.stopPropagation()" aria-label="Odstrániť uloženú ponuku">Odstrániť</button>
       </div>
     </div>
   </div>
 
-  <p *ngIf="!savedJobs.length && !isLoading()" class="muted">Žiadne uložené ponuky.</p>
-  <p *ngIf="!isLoading() && filteredJobs().length === 0">Žiadne výsledky pre zadané kritériá.</p>
+  <div class="results-heading">
+    <div>
+      <p class="section-kicker">Príležitosti pre teba</p>
+      <h2>Aktuálne pracovné ponuky</h2>
+    </div>
+    <span class="results-count">{{ filteredJobs().length }} {{ filteredJobs().length === 1 ? 'ponuka' : filteredJobs().length > 1 && filteredJobs().length < 5 ? 'ponuky' : 'ponúk' }}</span>
+  </div>
 
-  <div class="job-grid">
+  <p *ngIf="isLoading()" class="results-message" role="status">Hľadáme ponuky, ktoré by sa ti mohli páčiť…</p>
+  <div *ngIf="!isLoading() && filteredJobs().length === 0" class="empty-state">
+    <span class="empty-icon" aria-hidden="true">⌕</span>
+    <h3>Nenašli sme žiadne ponuky</h3>
+    <p>Skús upraviť kľúčové slová alebo lokalitu a vyhľadávanie zopakuj.</p>
+    <button class="btn-outline" type="button" (click)="clearFilters()">Zobraziť všetky ponuky</button>
+  </div>
+
+  <div class="job-grid" *ngIf="!isLoading() && filteredJobs().length">
     <article *ngFor="let job of filteredJobs()" class="job-card" (click)="startApplication(job.id, $event)">
       <div class="card-body">
-        <h3>{{ job.title }}</h3>
+        <div class="job-card-top">
+          <div class="company-avatar" aria-hidden="true">{{ job.company.charAt(0).toUpperCase() }}</div>
+          <button class="save-job-button" type="button" [class.is-saved]="isJobSaved(job.id)" [attr.aria-pressed]="isJobSaved(job.id)" [attr.aria-label]="isJobSaved(job.id) ? 'Odobrať z uložených ponúk' : 'Uložiť ponuku'" (click)="toggleSavedJob(job.id); $event.stopPropagation()">
+            <span aria-hidden="true">{{ isJobSaved(job.id) ? '♥' : '♡' }}</span>
+          </button>
+        </div>
         <p class="company">{{ job.company }}</p>
-        <p class="location">{{ job.location }}</p>
-        <p class="salary">{{ job.salary }}</p>
-        <p class="date-posted">Zverejnené: {{ job.datePosted | date }}</p>
+        <h3>{{ job.title }}</h3>
+        <div class="job-meta">
+          <span><span aria-hidden="true">⌖</span> {{ job.location }}</span>
+          <span *ngIf="job.employmentType"><span aria-hidden="true">◷</span> {{ job.employmentType }}</span>
+        </div>
+        <div class="job-card-footer">
+          <div>
+            <p class="salary">{{ job.salary || 'Mzda dohodou' }}</p>
+            <p class="date-posted">Zverejnené {{ job.datePosted | date }}</p>
+          </div>
+          <span class="job-open" aria-hidden="true">↗</span>
+        </div>
       </div>
     </article>
   </div>
@@ -292,3 +345,8 @@
     (fileRemove)="removeApplicationFile($event)">
   </app-application-panel>
 </section>
+
+<footer class="page-footer">
+  <span class="footer-brand"><span class="brand-symbol" aria-hidden="true">S</span> SmartJob Hunter</span>
+  <p>Ďalší krok tvojej kariéry začína tu.</p>
+</footer>
